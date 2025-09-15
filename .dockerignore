@@ -1,0 +1,12 @@
+target
+.git
+.github
+.gitignore
+Dockerfile
+*.log
+**/*.rs.bk
+**/*.swp
+**/*.swo
+node_modules
+target/
+

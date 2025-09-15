@@ -22,9 +22,12 @@ struct CacheState {
 // Capture any path segment(s) after root into `forward`
 #[get("/{forward:.*}")]
 async fn index(client: web::Data<reqwest::Client>, cache: web::Data<CacheState>, forward: web::Path<String>) -> impl Responder {
-    let forward = forward.into_inner();
+    // let forward = forward.into_inner();
+    let mut forward = forward.into_inner();
+    if !forward.starts_with("http://") && !forward.starts_with("https://") {
+        forward = format!("http://{}", forward);
+    }
     let key = format!("proxy:{}", forward);
-
     // Try cache lookup first
     if let Some(manager) = cache.manager.clone() {
         let mut cm = manager;
@@ -143,7 +146,7 @@ async fn main() -> std::io::Result<()> {
     };
 
     let cache_state = CacheState { manager: redis_manager, ttl_secs: cache_ttl_secs };
-    println!("{}", cache_state.manager.is_some());
+    println!("xx {}", cache_state.manager.is_some());
     println!(
         "Starting Actix Web server on {} (forward timeout {} ms, cache ttl {}s, cache {} )",
         bind_addr, timeout_ms, cache_ttl_secs, if cache_state.manager.is_some() { "ENABLED" } else { "DISABLED" }
