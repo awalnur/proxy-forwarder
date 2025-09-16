@@ -1,5 +1,4 @@
 
-
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use actix_web::http::{header, StatusCode};
 use std::time::Duration;
@@ -124,7 +123,7 @@ async fn main() -> std::io::Result<()> {
         .timeout(Duration::from_millis(timeout_ms))
         .build()
         .expect("failed to build reqwest client");
-
+    println!("xx {}", client.get("http://httpbin.org/ip").send().await.unwrap().text().await.unwrap());
     // Optional Redis cache
     let redis_manager = match std::env::var("REDIS_URL") {
         Ok(url) => {
@@ -146,7 +145,7 @@ async fn main() -> std::io::Result<()> {
     };
 
     let cache_state = CacheState { manager: redis_manager, ttl_secs: cache_ttl_secs };
-    println!("xx {}", cache_state.manager.is_some());
+    println!("xxs {}", cache_state.manager.is_some());
     println!(
         "Starting Actix Web server on {} (forward timeout {} ms, cache ttl {}s, cache {} )",
         bind_addr, timeout_ms, cache_ttl_secs, if cache_state.manager.is_some() { "ENABLED" } else { "DISABLED" }
@@ -167,7 +166,6 @@ async fn main() -> std::io::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use actix_web::{test, web, App};
     use actix_web::http::{header, StatusCode};
     use std::time::Duration as StdDuration;
